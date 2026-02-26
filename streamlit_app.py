@@ -5,8 +5,8 @@ st.title("🛒 Shopper Spectrum")
 
 # Try loading models safely
 try:
-    kmeans = joblib.load("models/kmeans.pkl")
-    scaler = joblib.load("models/scaler.pkl")
+    kmeans = joblib.load("kmeans.pkl")
+    scaler = joblib.load("scaler.pkl")
     similarity_df = joblib.load("models/product_similarity.pkl")
     st.success("Models loaded successfully ✅")
 except Exception as e:
@@ -43,3 +43,4 @@ if st.button("Predict Cluster"):
     cluster = kmeans.predict(data)[0]
     st.success(f"Predicted Cluster: {cluster}")
 product = st.selectbox("Select Product", similarity_df.columns)
+
