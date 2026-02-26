@@ -6,6 +6,30 @@ import requests
 st.title("🛒 Shopper Spectrum")
 
 # -----------------------------
+# Google Drive Download Function (Handles Large Files)
+# -----------------------------
+
+def download_file_from_drive(file_id, destination):
+    URL = "https://drive.google.com/uc?export=download"
+    session = requests.Session()
+
+    response = session.get(URL, params={"id": file_id}, stream=True)
+
+    # Handle large file confirmation token
+    for key, value in response.cookies.items():
+        if key.startswith("download_warning"):
+            response = session.get(
+                URL,
+                params={"id": file_id, "confirm": value},
+                stream=True,
+            )
+
+    with open(destination, "wb") as f:
+        for chunk in response.iter_content(32768):
+            if chunk:
+                f.write(chunk)
+
+# -----------------------------
 # Load Models Safely
 # -----------------------------
 
@@ -14,14 +38,13 @@ try:
     kmeans = joblib.load("kmeans.pkl")
     scaler = joblib.load("scaler.pkl")
 
-    # Download similarity file if not present
+    # Download similarity model if not present
     if not os.path.exists("product_similarity.pkl"):
-        file_id = "1gO83w912PxAJl7Ydze4p7eoDF0qkyiOW"
-        url = f"https://drive.google.com/uc?export=download&id={file_id}"
-        response = requests.get(url)
-
-        with open("product_similarity.pkl", "wb") as f:
-            f.write(response.content)
+        st.info("Downloading recommendation model... ⏳")
+        download_file_from_drive(
+            "1gO83w912PxAJl7Ydze4p7eoDF0qkyiOW",
+            "product_similarity.pkl",
+        )
 
     # Load similarity dataframe
     similarity_df = joblib.load("product_similarity.pkl")
