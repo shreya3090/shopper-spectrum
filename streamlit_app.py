@@ -1,5 +1,7 @@
 import streamlit as st
 import joblib
+import os
+import requests
 
 st.title("🛒 Shopper Spectrum")
 
@@ -7,6 +9,17 @@ st.title("🛒 Shopper Spectrum")
 try:
     kmeans = joblib.load("kmeans.pkl")
     scaler = joblib.load("scaler.pkl")
+
+
+# Download similarity file from Google Drive if not present
+if not os.path.exists("product_similarity.pkl"):
+    file_id = "1gO83w912PxAJl7Ydze4p7eoDF0qkyiOW"
+    url = f"https://drive.google.com/uc?export=download&id={file_id}"
+    
+    response = requests.get(url)
+    
+    with open("product_similarity.pkl", "wb") as f:
+        f.write(response.content)
     similarity = joblib.load("product_similarity.pkl")
     st.success("Models loaded successfully ✅")
 except Exception as e:
@@ -43,5 +56,6 @@ if st.button("Predict Cluster"):
     cluster = kmeans.predict(data)[0]
     st.success(f"Predicted Cluster: {cluster}")
 product = st.selectbox("Select Product", similarity_df.columns)
+
 
 
