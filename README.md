@@ -86,4 +86,4 @@ README.md
 ---
 
 ## 👩‍💻 Author
-Shreya
+Shreya Sachan
